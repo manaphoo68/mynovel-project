@@ -1,0 +1,14 @@
+/* === frontend/src/components/WorkListItem/WorkListItem.css === */
+.work-list-item { display: grid; grid-template-columns: 80px 3fr 1fr 1fr 1fr 1fr 1fr; align-items: center; gap: 15px; padding: 10px 15px; background-color: #fff; border-bottom: 1px solid #f1f3f5; }
+.work-cover { width: 60px; height: 80px; background-color: #e9ecef; border-radius: 4px; overflow: hidden; }
+.work-cover img { width: 100%; height: 100%; object-fit: cover; }
+.no-cover { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; color: #888; text-align: center; }
+.work-title-desc { display: flex; flex-direction: column; }
+.work-title { font-weight: 600; color: #333; margin-bottom: 5px; }
+.work-category { font-size: 0.9em; color: #888; }
+.work-views, .work-chapters, .work-completion-status { color: #555; text-align: center; }
+.work-status-text { font-weight: bold; text-align: center; }
+.work-status-text.status--published { color: #28a745; }
+.work-status-text.status--draft { color: #888; }
+.work-actions { display: flex; justify-content: center; }
+.more-options-btn { background: none; border: none; font-size: 1.2em; color: #888; cursor: pointer; }

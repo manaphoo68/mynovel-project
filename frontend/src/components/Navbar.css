@@ -1,0 +1,266 @@
+/* === General Navbar Styling === */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--surface-color);
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 60px;
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  
+  .navbar-left,
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  /* === Left Side === */
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 10px;
+    margin-right: 15px;
+  }
+  .logo {
+    background-color: var(--accent-color);
+    color: var(--background-color);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8em;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  body.dark .logo {
+    text-shadow: var(--glow-accent);
+  }
+  .navbar-links {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+    gap: 15px;
+  }
+  .navbar-links > a {
+    position: relative;
+    text-decoration: none;
+    color: var(--text-secondary-color);
+    font-weight: 500;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    padding: 0 5px 5px 5px;
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+  .navbar-links > a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 5px;
+    right: 5px;
+    height: 2px;
+    background-color: var(--accent-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease-in-out;
+  }
+  .navbar-links > a:hover::after,
+  .navbar-links > a.active::after {
+    transform: scaleX(1);
+  }
+  .navbar-links > a:hover,
+  .navbar-links > a.active {
+    color: var(--text-primary-color);
+  }
+  body.dark .navbar-links > a:hover,
+  body.dark .navbar-links > a.active {
+    color: var(--accent-color);
+  }
+  
+  /* === Right Side === */
+  .search-container {
+    position: relative;
+  }
+  .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary-color);
+  }
+  .search-container input {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 8px 15px 8px 40px;
+    width: 200px;
+    color: var(--text-primary-color);
+    transition: all 0.3s ease;
+  }
+  .search-container input:focus {
+    outline: none;
+    width: 250px;
+    border-color: var(--accent-color);
+  }
+  body.dark .search-container input:focus {
+    box-shadow: var(--glow-accent);
+  }
+  .notification-bell {
+    position: relative;
+    font-size: 1.3em;
+    color: var(--text-secondary-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  .notification-dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-secondary-color, #dc3545);
+    border-radius: 50%;
+    border: 2px solid var(--surface-color);
+  }
+  body.dark .notification-dot {
+    border-color: var(--surface-color);
+  }
+  .theme-toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.3em;
+    color: var(--text-secondary-color);
+    display: flex;
+    align-items: center;
+  }
+  .auth-section {
+    display: flex;
+    align-items: center;
+  }
+  .login-button {
+    padding: 8px 16px;
+    font-size: 0.9em;
+    color: #fff;
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+  }
+  body.dark .login-button {
+    color: var(--background-dark);
+    background-color: var(--accent-secondary-color);
+    box-shadow: 0 0 2px var(--accent-secondary-color), 0 0 5px var(--accent-secondary-color);
+  }
+  .login-button:hover {
+    transform: scale(1.05);
+  }
+  
+  /***********************************************/
+  /* === Mobile Menu Specific Styles === */
+  /***********************************************/
+  .mobile-menu-toggle {
+    display: none; /* ซ่อนในตอนแรก */
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-secondary-color);
+    z-index: 1002;
+  }
+  
+  .mobile-menu-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+  .mobile-menu-backdrop.open {
+    display: block;
+  }
+  
+  /* [ปรับแก้แล้ว] โค้ดส่วนนี้ถูกปรับให้สไลด์จากด้านซ้าย */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: -100%; /* ซ่อนนอกจอด้านซ้าย */
+    width: 300px;
+    max-width: 80%;
+    height: 100%;
+    background-color: var(--surface-color);
+    z-index: 1001;
+    transition: left 0.3s ease-in-out; /* transition ของ left */
+    padding-top: 60px;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.15); /* เงาอยู่ด้านขวา */
+    overflow-y: auto;
+  }
+  /* [ปรับแก้แล้ว] */
+  .mobile-menu.open {
+    left: 0;
+  }
+  
+  .mobile-menu-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .auth-section-mobile {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .mobile-menu-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0.5rem 0;
+  }
+  
+  .mobile-menu-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--text-secondary-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  
+  .mobile-menu-item:hover,
+  .mobile-menu-item.active {
+    background-color: var(--background-color);
+    color: var(--text-primary-color);
+  }
+  
+  
+  /* === Media Query สำหรับ Responsive === */
+  @media (max-width: 1250px) {
+    /* ซ่อน element ของ desktop */
+    .desktop-only {
+      display: none;
+    }
+    /* แสดงปุ่ม hamburger */
+    .mobile-menu-toggle {
+      display: flex;
+    }
+  }

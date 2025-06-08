@@ -1,0 +1,22 @@
+/* === frontend/src/index.css === */
+:root {
+  /* --- ชุดสี Light Mode (กลางวัน) --- */
+  --background-color: #f8f9fa;
+  --surface-color: #ffffff;
+  --text-primary-color: #212529;
+  --text-secondary-color: #6c757d;
+  --accent-color: #007bff;
+  --border-color: #dee2e6;
+}
+
+body.dark {
+  /* --- ชุดสี Dark Mode (Neonpunk) --- */
+  --background-color: #0d0c1d;
+  --surface-color: #1c1b2e;
+  --text-primary-color: #e0e0e0;
+  --text-secondary-color: #a0a0a0;
+  --accent-color: #00f6ff;
+  --accent-secondary-color: #ff00c1;
+  --border-color: #333;
+  --glow-accent: 0 0 2px var(--accent-color), 0 0 5px var(--accent-color);
+}
