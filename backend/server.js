@@ -1,4 +1,4 @@
-// === ไฟล์ backend/server.js (เวอร์ชันล่าสุด) ===
+// === backend/server.js ===
 
 const express = require('express');
 const path = require('path');
@@ -7,19 +7,30 @@ const pool = require('./database');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const cors = require('cors');
+const multer = require('multer');
 
 const app = express();
 const port = 3000;
 
-// Middleware
+// --- Multer Storage Configuration ---
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
+
+// --- Middleware ---
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true
 }));
+app.use('/uploads', express.static('uploads'));
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
-
-// Session Middleware
 app.use(session({
     store: new pgSession({
         pool: pool,
@@ -38,15 +49,30 @@ app.use(session({
 // --- API Routes ---
 
 // API สมัครสมาชิก
-app.post('/api/register', async (req, res) => { 
+app.post('/api/register', upload.single('profileImage'), async (req, res) => {
     try {
-        const { username, email, password } = req.body;
-        if (!username || !email || !password) { return res.status(400).json({ message: 'กรุณากรอกข้อมูลให้ครบถ้วน' }); }
+        const { username, email, password, firstName, lastName } = req.body;
+        const profileImageUrl = req.file ? req.file.path.replace(/\\/g, "/") : null;
+
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน' });
+        }
+        
         const userExists = await pool.query("SELECT * FROM users WHERE username = $1 OR email = $2", [username, email]);
-        if (userExists.rows.length > 0) { return res.status(409).json({ message: 'ชื่อผู้ใช้หรืออีเมลนี้มีในระบบแล้ว' }); }
+        if (userExists.rows.length > 0) {
+            return res.status(409).json({ message: 'ชื่อผู้ใช้หรืออีเมลนี้มีในระบบแล้ว' });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const password_hash = await bcrypt.hash(password, salt);
-        const newUser = await pool.query("INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING user_id, username, email", [username, email, password_hash] );
+
+        const newUser = await pool.query(
+            `INSERT INTO users (username, email, password_hash, first_name, last_name, profile_image_url) 
+             VALUES ($1, $2, $3, $4, $5, $6) 
+             RETURNING user_id, username, email`,
+            [username, email, password_hash, firstName, lastName, profileImageUrl]
+        );
+
         res.status(201).json({ message: 'สมัครสมาชิกสำเร็จ!', user: newUser.rows[0] });
     } catch (error) {
         console.error('เกิดข้อผิดพลาดที่ /api/register:', error);
@@ -108,7 +134,7 @@ app.post('/api/novels', async (req, res) => {
     }
 });
 
-// === API ใหม่: ดึงข้อมูลนิยายทั้งหมดของผู้ใช้ที่ล็อกอินอยู่ ===
+// API ดึงข้อมูลนิยายทั้งหมดของผู้ใช้ที่ล็อกอินอยู่
 app.get('/api/novels/my-works', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ message: 'กรุณาเข้าสู่ระบบ' });
@@ -132,6 +158,31 @@ app.get('/api/novels/my-works', async (req, res) => {
     }
 });
 
+// API สำหรับดึงข้อมูลสรุปของ Dashboard
+app.get('/api/dashboard/overview', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ message: 'กรุณาเข้าสู่ระบบ' });
+    }
+    try {
+        const userId = req.session.userId;
+        const userEarnings = await pool.query("SELECT balance_writer_earnings, balance_affiliate_earnings FROM users WHERE user_id = $1", [userId]);
+        const novelStats = await pool.query(`SELECT COALESCE(SUM(view_count), 0)::int AS total_views, COUNT(novel_id)::int AS total_novels FROM novels WHERE author_id = $1`,[userId]);
+        const recentWorks = await pool.query("SELECT novel_id, title, cover_image_url FROM novels WHERE author_id = $1 ORDER BY updated_at DESC LIMIT 5", [userId]);
+        const overviewData = {
+            writerEarnings: userEarnings.rows[0]?.balance_writer_earnings || '0.00',
+            affiliateEarnings: userEarnings.rows[0]?.balance_affiliate_earnings || '0.00',
+            totalViews: novelStats.rows[0]?.total_views || 0,
+            totalNovels: novelStats.rows[0]?.total_novels || 0,
+            totalComments: 0, // Placeholder
+            totalFollowers: 0, // Placeholder
+            recentWorks: recentWorks.rows
+        };
+        res.status(200).json(overviewData);
+    } catch (error) {
+        console.error('เกิดข้อผิดพลาดที่ /api/dashboard/overview:', error);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
+    }
+});
 
 // Start Server
 app.listen(port, () => {

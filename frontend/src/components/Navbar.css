@@ -6,7 +6,7 @@
     background-color: var(--surface-color);
     padding: 10px 20px;
     border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
     position: fixed;
     top: 0;
     left: 0;
@@ -29,7 +29,7 @@
     align-items: center;
     text-decoration: none;
     gap: 10px;
-    margin-right: 15px;
+    margin-right: 2rem;
   }
   .logo {
     background-color: var(--accent-color);
@@ -62,7 +62,7 @@
     display: flex;
     align-items: center;
     padding: 0 5px 5px 5px;
-    font-size: 0.9em;
+    font-size: 1rem; /* [ปรับแก้ล่าสุด] เพิ่มขนาดฟอนต์ */
     white-space: nowrap;
   }
   .navbar-links > a::after {
@@ -151,6 +151,33 @@
     display: flex;
     align-items: center;
   }
+  
+  .auth-section .avatar-button {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid var(--accent-color);
+    padding: 2px;
+    background-color: var(--surface-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .auth-section .avatar-button:hover {
+    transform: scale(1.1);
+  }
+  body.dark .auth-section .avatar-button {
+    border-color: var(--accent-secondary-color);
+  }
+  .auth-section .avatar-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
   .login-button {
     padding: 8px 16px;
     font-size: 0.9em;
@@ -175,7 +202,7 @@
   /* === Mobile Menu Specific Styles === */
   /***********************************************/
   .mobile-menu-toggle {
-    display: none; /* ซ่อนในตอนแรก */
+    display: none;
     background: none;
     border: none;
     cursor: pointer;
@@ -183,7 +210,6 @@
     color: var(--text-secondary-color);
     z-index: 1002;
   }
-  
   .mobile-menu-backdrop {
     display: none;
     position: fixed;
@@ -197,35 +223,35 @@
   .mobile-menu-backdrop.open {
     display: block;
   }
-  
-  /* [ปรับแก้แล้ว] โค้ดส่วนนี้ถูกปรับให้สไลด์จากด้านซ้าย */
   .mobile-menu {
     position: fixed;
     top: 0;
-    left: -100%; /* ซ่อนนอกจอด้านซ้าย */
+    left: -100%;
     width: 300px;
     max-width: 80%;
     height: 100%;
     background-color: var(--surface-color);
     z-index: 1001;
-    transition: left 0.3s ease-in-out; /* transition ของ left */
-    padding-top: 60px;
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.15); /* เงาอยู่ด้านขวา */
-    overflow-y: auto;
+    transition: left 0.3s ease-in-out;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
   }
-  /* [ปรับแก้แล้ว] */
   .mobile-menu.open {
     left: 0;
   }
   
-  .mobile-menu-content {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
+  .mobile-menu-header {
+      flex-shrink: 0;
+  }
+  
+  .mobile-links-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 0 1rem 1rem 1rem;
   }
   
   .auth-section-mobile {
-    margin-bottom: 1rem;
     display: flex;
     justify-content: center;
   }
@@ -233,34 +259,88 @@
   .mobile-menu-divider {
     border: none;
     border-top: 1px solid var(--border-color);
-    margin: 0.5rem 0;
+    margin: 1rem 0;
   }
-  
   .mobile-menu-item {
     display: block;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0;
     text-decoration: none;
     color: var(--text-secondary-color);
     border-radius: 8px;
     font-size: 1rem;
     transition: background-color 0.2s, color 0.2s;
   }
-  
   .mobile-menu-item:hover,
   .mobile-menu-item.active {
     background-color: var(--background-color);
     color: var(--text-primary-color);
   }
   
+  .mobile-profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem;
+    background-color: var(--background-secondary, #f0f2f5);
+  }
+  body.dark .mobile-profile-section {
+    background-color: var(--background-secondary, #2a2a3e);
+  }
+  .mobile-profile-section .avatar-button {
+    width: 72px;
+    height: 72px;
+    border-width: 4px;
+  }
+  .mobile-username {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary-color);
+    margin: 0;
+    margin-top: 0.25rem;
+  }
+  .edit-profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    color: var(--text-secondary-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .edit-profile-link:hover {
+    background-color: var(--accent-color-subtle, #e9ecef);
+    color: var(--text-primary-color);
+  }
   
-  /* === Media Query สำหรับ Responsive === */
-  @media (max-width: 1250px) {
-    /* ซ่อน element ของ desktop */
+  /* === Media Query === */
+  @media (max-width: 1400px) {
+    .hide-on-large {
+      display: none;
+    }
+  }
+  @media (max-width: 1200px) {
+    .hide-on-medium {
+      display: none;
+    }
+  }
+  @media (max-width: 992px) {
+    .navbar {
+      padding: 0 1rem;
+    }
     .desktop-only {
       display: none;
     }
-    /* แสดงปุ่ม hamburger */
     .mobile-menu-toggle {
       display: flex;
+    }
+  }
+  @media (max-width: 480px) {
+    .navbar-right {
+      gap: 10px;
     }
   }
