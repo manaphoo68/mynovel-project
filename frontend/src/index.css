@@ -1,22 +1,102 @@
-/* === frontend/src/index.css === */
-:root {
-  /* --- ชุดสี Light Mode (กลางวัน) --- */
-  --background-color: #f8f9fa;
-  --surface-color: #ffffff;
-  --text-primary-color: #212529;
-  --text-secondary-color: #6c757d;
-  --accent-color: #007bff;
-  --border-color: #dee2e6;
+/* === CSS Reset === */
+body {
+  margin: 0;
+  font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* [สำคัญ] ตั้งค่าสีพื้นฐานสำหรับ Light Mode ที่นี่ */
+  background-color: var(--background-color);
+  color: var(--text-primary-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-body.dark {
-  /* --- ชุดสี Dark Mode (Neonpunk) --- */
-  --background-color: #0d0c1d;
-  --surface-color: #1c1b2e;
-  --text-primary-color: #e0e0e0;
-  --text-secondary-color: #a0a0a0;
-  --accent-color: #00f6ff;
-  --accent-secondary-color: #ff00c1;
-  --border-color: #333;
-  --glow-accent: 0 0 2px var(--accent-color), 0 0 5px var(--accent-color);
+/* === [อัปเดตล่าสุด] CSS Variables สำหรับทุกธีม === */
+:root {
+  /* --- ชุดสีสำหรับ Light Mode (ธีมเริ่มต้น) --- */
+  --bg-light: #ffffff;
+  --surface-light: #ffffff;
+  --text-primary-light: #212529;
+  --text-secondary-light: #6c757d;
+  --border-light: #dee2e6;
+  --accent-light: #007bff; /* สีน้ำเงิน */
+  --accent-secondary-light: #6f42c1; /* สีม่วง */
+  --accent-subtle-light: #e9f5ff;
+
+  /* --- ชุดสีสำหรับ Dark Mode (Inksutra Theme) --- */
+  --bg-dark: #121212;
+  --surface-dark: #1E1E1E;
+  --text-primary-dark: #E5E7EB;
+  --text-secondary-dark: #9CA3AF;
+  --border-dark: #374151;
+  --accent-gold-dark: #DAA520; /* สีทอง */
+  --accent-purple-dark: #9370DB; /* สีม่วง MediumPurple */
+  --accent-subtle-dark: #2a3b4d;
+
+  /* --- ตัวแปรกลางที่จะถูกสลับค่าไปมา --- */
+  /* ค่าเริ่มต้นคือ Light Mode */
+  --background-color: var(--bg-light);
+  --surface-color: var(--surface-light);
+  --text-primary-color: var(--text-primary-light);
+  --text-secondary-color: var(--text-secondary-light);
+  --border-color: var(--border-light);
+  --accent-color: var(--accent-light);
+  --accent-secondary-color: var(--accent-secondary-light);
+  --accent-color-subtle: var(--accent-subtle-light);
+  --glow-accent: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
+}
+
+/* === [สำคัญ] สไตล์สำหรับ Dark Theme โดยรวม === */
+/* เมื่อแท็ก <html> มี class="dark" ให้ทำการสลับค่าตัวแปรกลางทั้งหมด */
+html.dark {
+  --background-color: var(--bg-dark);
+  --surface-color: var(--surface-dark);
+  --text-primary-color: var(--text-primary-dark);
+  --text-secondary-color: var(--text-secondary-dark);
+  --border-color: var(--border-dark);
+  --accent-color: var(--accent-gold-dark);
+  --accent-secondary-color: var(--accent-purple-dark);
+  --accent-color-subtle: var(--accent-subtle-dark);
+}
+
+
+/* === Main Layout Styling === */
+.main-content {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2rem;
+  padding-top: 80px; 
+  box-sizing: border-box;
+}
+.app-container.login-layout .main-content {
+    padding-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+
+/* === Responsive for smaller screens === */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+    padding-top: 70px;
+  }
+  .app-container.login-layout .main-content {
+    padding-top: 1rem;
+  }
+}
+
+/* --- Layout พิเศษสำหรับหน้าที่มีพื้นหลังเต็มจอ --- */
+.app-container.login-layout {
+  background-image: 
+    linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 0.8)),
+    url('./assets/sky-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }

@@ -1,0 +1,68 @@
+.verification-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    box-sizing: border-box;
+    background-color: var(--background-color);
+  }
+  
+  .verification-card {
+    background-color: var(--surface-color);
+    padding: 2.5rem 3rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+    text-align: center;
+    max-width: 500px;
+  }
+  
+  .verification-card .icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .verification-card .icon.loading {
+    color: var(--accent-color);
+    animation: spin 1.5s linear infinite;
+  }
+  
+  .verification-card .icon.success {
+    color: #28a745;
+  }
+  
+  .verification-card .icon.error {
+    color: #dc3545;
+  }
+  
+  .verification-card h2 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary-color);
+  }
+  
+  .verification-card p {
+    color: var(--text-secondary-color);
+    line-height: 1.6;
+  }
+  
+  .login-link-button {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 12px 24px;
+    background-color: var(--accent-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+  
+  .login-link-button:hover {
+    opacity: 0.9;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

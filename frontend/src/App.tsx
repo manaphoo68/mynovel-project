@@ -1,90 +1,127 @@
-// === frontend/src/App.tsx (เวอร์ชันเต็ม สมบูรณ์ที่สุด) ===
-import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useLocation, useNavigate, Navigate, Outlet } from 'react-router-dom';
 
-// Import Components
-import Navbar from './components/Navbar';
-import AuthModal from './components/AuthModal/AuthModal';
-
-// Import Pages
+// --- Page Imports ---
 import HomePage from './pages/HomePage';
-import TermsPage from './pages/TermsPage';
-import CreateNovelPage from './pages/CreateNovelPage';
-import DashboardPage from './pages/DashboardPage';
-import MyWorksPage from './pages/MyWorksPage';
-import ManageNovelPage from './pages/ManageNovelPage';
-import AffiliateInfoPage from './pages/AffiliateInfoPage';
-import BecomeAuthorPage from './pages/BecomeAuthorPage';
+import LoginPage from './pages/LoginPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
+import DashboardLayout from './pages/Dashboard/DashboardLayout';
+import DashboardOverviewPage from './pages/Dashboard/DashboardOverviewPage';
+// import MyWorksPage from './pages/Dashboard/MyWorksPage';
 
-// กำหนด Type สำหรับข้อมูล User
+// --- Component Imports ---
+import Navbar from './components/Navbar/Navbar';
+import SearchModal from './components/SearchModal/SearchModal';
+import ProtectedRoute from './utils/ProtectedRoute';
+
+// --- Context Imports ---
+import { useTheme } from './context/ThemeContext';
+
+// --- Type Definitions ---
 type User = {
   user_id: number;
   username: string;
   profile_image_url?: string;
+  balance_safe?: number;
+  is_writer?: boolean;
 };
 
-function App() {
-  // --- State Management ---
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+declare global {
+  interface Window { login: (user: User) => void; logout: () => void; }
+}
 
-  // --- Data Fetching & Side Effects ---
-  const checkLoginStatus = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/me', { credentials: 'include' });
-      const data = await response.json();
-      if (data.isLoggedIn) {
-        setCurrentUser(data.user);
-      } else {
-        setCurrentUser(null);
-      }
-    } catch (error) {
-      console.error("Could not fetch login status:", error);
-      setCurrentUser(null);
+const MainLayout: React.FC = () => {
+  return (
+    <main className="main-content">
+      <Outlet />
+    </main>
+  );
+};
+
+
+function App() {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const { theme } = useTheme();
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const getPageClass = () => {
+    if (location.pathname.startsWith('/dashboard') || location.pathname === '/login') {
+      return 'login-layout';
     }
+    return 'default-layout';
+  };
+
+  const handleLoginSuccess = (userData: User) => {
+    setCurrentUser(userData);
   };
 
   useEffect(() => {
-    checkLoginStatus();
+    const checkCurrentUser = async () => {
+      setIsLoadingUser(true);
+      try {
+        const response = await fetch('http://localhost:3000/api/me', { credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.isLoggedIn) {
+            setCurrentUser(data.user);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+    checkCurrentUser();
   }, []);
 
-  // --- Event Handlers ---
   const handleLogout = async () => {
-    await fetch('http://localhost:3000/api/logout', { method: 'POST', credentials: 'include' });
-    alert('ออกจากระบบสำเร็จ');
-    checkLoginStatus();
+    try {
+        await fetch('http://localhost:3000/api/logout', { 
+            method: 'POST',
+            credentials: 'include' 
+        });
+        setCurrentUser(null);
+        navigate('/');
+    } catch(error) {
+        console.error('Logout failed:', error);
+    }
   };
 
-  const handleLoginSuccess = () => {
-    setIsModalOpen(false);
-    checkLoginStatus();
-  };
+  if (isLoadingUser) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div>
-      <Navbar 
-        currentUser={currentUser} 
-        onAuthClick={() => setIsModalOpen(true)}
+    <div className={`app-container ${theme} ${getPageClass()}`}>
+      <Navbar
+        currentUser={currentUser}
         onLogout={handleLogout}
+        onSearchClick={() => setIsSearchModalOpen(true)}
       />
-      <AuthModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
+      <SearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
       />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/affiliate-info" element={<AffiliateInfoPage />} />
-        <Route path="/become-author" element={<BecomeAuthorPage />} />
 
-        <Route path="/create-novel" element={<CreateNovelPage />} />
-        <Route path="/dashboard" element={<DashboardPage />}>
-          <Route index element={<MyWorksPage />} />
-          <Route path="works" element={<MyWorksPage />} />
-          <Route path="novels/:novelId" element={<ManageNovelPage />} />
+      <Routes>
+        <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Route>
+
+        <Route element={<ProtectedRoute currentUser={currentUser} />}>
+          <Route path="/dashboard" element={<DashboardLayout currentUser={currentUser} />}>
+            <Route index element={<DashboardOverviewPage />} />
+            {/* <Route path="my-works" element={<MyWorksPage />} /> */}
+          </Route>
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );

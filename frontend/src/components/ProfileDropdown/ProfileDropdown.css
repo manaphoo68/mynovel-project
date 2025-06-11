@@ -1,79 +1,81 @@
 .profile-dropdown {
-    position: relative;
-  }
-  
-  .avatar-button {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    border-radius: 50%;
-    display: flex;
-  }
-  
-  .profile-dropdown-content {
-    position: absolute;
-    top: 120%;
-    right: 0;
-    background-color: var(--surface-color);
-    min-width: 220px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-  }
-  
-  .dropdown-header {
-    padding: 15px;
-    border-bottom: 1px solid var(--border-color);
-    text-align: center; /* เพิ่มให้ชื่ออยู่กลาง */
-  }
-  
-  .dropdown-item {
-    display: flex; /* ทำให้ไอคอนกับข้อความเรียงกัน */
-    align-items: center; /* จัดให้อยู่กลางแนวตั้ง */
-    gap: 12px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
-    width: 100%;
-    padding: 12px 16px;
-    text-decoration: none;
-    color: var(--text-primary-color);
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1em;
-  }
-  
-  .dropdown-item:hover {
-    background-color: var(--background-color);
-  }
-  
-  .dropdown-divider {
-    border: 0;
-    border-top: 1px solid var(--border-color);
-    margin: 5px 0;
-  }
-  
-  .dropdown-icon {
-    width: 18px; /* กำหนดขนาดไอคอนให้เท่ากัน */
-    text-align: center;
-    color: var(--text-secondary-color);
-    flex-shrink: 0; /* ไม่ให้ไอคอนหดตัว */
-  }
-  
-  .dropdown-item.logout {
+  position: relative;
+}
+
+.avatar-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center; /* เพิ่มเพื่อให้รูปอยู่กลาง */
+}
+
+/* [แก้ไข] ใช้ position: fixed และ z-index สูงๆ */
+.profile-dropdown-content {
+  position: fixed; 
+  background-color: var(--surface-color);
+  min-width: 220px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 9999; 
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.dropdown-header {
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.dropdown-item {
+  /* [แก้ไข] สไตล์เพื่อให้ <button> หน้าตาเหมือน <Link> */
+  display: flex; 
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: var(--text-primary-color);
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit; /* ใช้ฟอนต์เดียวกันกับเว็บ */
+  font-size: 1em;
+  margin: 0;
+}
+
+.dropdown-item:hover {
+  background-color: var(--background-color);
+}
+
+.dropdown-divider {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  margin: 5px 0;
+}
+
+.dropdown-icon {
+  width: 18px;
+  text-align: center;
+  color: var(--text-secondary-color);
+  flex-shrink: 0;
+}
+
+.dropdown-item.logout {
+  color: #dc3545;
+}
+
+.dropdown-item.logout .dropdown-icon {
     color: #dc3545;
-  }
-  
-  /* ทำให้ไอคอนตอน Logout เป็นสีแดงด้วย */
-  .dropdown-item.logout .dropdown-icon {
-      color: #dc3545;
-  }
-  
-  body.dark .dropdown-item.logout {
+}
+
+html.dark .dropdown-item.logout {
+  color: var(--accent-secondary-color, #ff00c1);
+}
+html.dark .dropdown-item.logout .dropdown-icon {
     color: var(--accent-secondary-color, #ff00c1);
-  }
-  body.dark .dropdown-item.logout .dropdown-icon {
-      color: var(--accent-secondary-color, #ff00c1);
-  }
+}

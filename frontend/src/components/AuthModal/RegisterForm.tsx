@@ -1,57 +1,116 @@
-// === src/components/AuthModal/RegisterForm.tsx (เวอร์ชันใหม่) ===
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const RegisterForm = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  // 1. เพิ่ม State เพื่อจำว่าผู้ใช้ติ๊กยอมรับเงื่อนไขแล้วหรือยัง
-  const [agreed, setAgreed] = useState(false);
+const RegisterForm: React.FC = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+  });
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfileImage(e.target.files[0]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
 
-    // 2. ตรวจสอบก่อนส่งข้อมูล
-    if (!agreed) {
-      alert('กรุณายอมรับเงื่อนไขและข้อตกลงในการให้บริการ');
-      return; // หยุดการทำงาน
+    if (formData.password !== formData.confirmPassword) {
+      setError('รหัสผ่านไม่ตรงกัน');
+      return;
     }
 
-    const response = await fetch('http://localhost:3000/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password })
-    });
-    const result = await response.json();
-    alert(result.message);
-    if (response.ok) {
-        // อาจจะสั่งให้สลับไปหน้า login อัตโนมัติในอนาคต
+    const submissionData = new FormData();
+    submissionData.append('username', formData.username);
+    submissionData.append('email', formData.email);
+    submissionData.append('password', formData.password);
+    submissionData.append('firstName', formData.firstName);
+    submissionData.append('lastName', formData.lastName);
+    
+    if (profileImage) {
+      submissionData.append('profileImage', profileImage);
+    }
+
+    // [เพิ่มล่าสุด] ดึงรหัสผู้แนะนำจาก localStorage แล้วแนบไปกับข้อมูล
+    const referralCode = localStorage.getItem('referralCode');
+    if (referralCode) {
+        submissionData.append('referralCode', referralCode);
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        body: submissionData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก');
+      }
+
+      setSuccess('สมัครสมาชิกสำเร็จ! คุณสามารถสลับไปหน้าเข้าสู่ระบบได้แล้ว');
+
+    } catch (err: any) {
+      setError(err.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="ชื่อผู้ใช้" required style={{ padding: '10px', marginBottom: '10px' }} />
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="อีเมล" required style={{ padding: '10px', marginBottom: '10px' }} />
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="รหัสผ่าน" required style={{ padding: '10px', marginBottom: '10px' }} />
+    <form onSubmit={handleSubmit} className="auth-form">
+      {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
 
-      {/* 3. เพิ่มส่วนของ Checkbox และลิงก์ */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px', fontSize: '0.9em' }}>
-        <input 
-          type="checkbox" 
-          id="agree-terms"
-          checked={agreed}
-          onChange={(e) => setAgreed(e.target.checked)}
-          style={{ margin: '0 10px 0 0' }}
+      <div className="form-group">
+        <label htmlFor="reg-username">ชื่อผู้ใช้</label>
+        <input type="text" id="reg-username" name="username" placeholder="ตั้งชื่อที่ไม่ซ้ำใคร" onChange={handleChange} required />
+      </div>
+      <div className="form-group">
+        <label htmlFor="reg-email">อีเมล</label>
+        <input type="email" id="reg-email" name="email" placeholder="กรอกอีเมลของคุณ" onChange={handleChange} required />
+      </div>
+      <div className="form-group">
+        <label htmlFor="reg-password">รหัสผ่าน</label>
+        <input type="password" id="reg-password" name="password" placeholder="อย่างน้อย 6 ตัวอักษร" onChange={handleChange} required />
+      </div>
+      <div className="form-group">
+        <label htmlFor="reg-confirmPassword">ยืนยันรหัสผ่าน</label>
+        <input type="password" id="reg-confirmPassword" name="confirmPassword" placeholder="กรอกรหัสผ่านอีกครั้ง" onChange={handleChange} required />
+      </div>
+      
+      <div className="form-group terms-and-conditions">
+        <input
+          type="checkbox"
+          id="terms"
+          checked={agreedToTerms}
+          onChange={(e) => setAgreedToTerms(e.target.checked)}
         />
-        <label htmlFor="agree-terms">
-          ข้าพเจ้ายอมรับ <a href="/terms" target="_blank" rel="noopener noreferrer">เงื่อนไขและข้อตกลง</a> ในการให้บริการ
+        <label htmlFor="terms">
+          ข้าพเจ้ายอมรับ <Link to="/terms-of-service" target="_blank">เงื่อนไขและข้อตกลง</Link> ในการให้บริการ
         </label>
       </div>
 
-      {/* 4. ทำให้ปุ่มกดไม่ได้ถ้ายังไม่ติ๊กยอมรับ */}
-      <button type="submit" disabled={!agreed} style={{ padding: '10px', cursor: agreed ? 'pointer' : 'not-allowed', opacity: agreed ? 1 : 0.6 }}>
-        สมัครสมาชิก
+      <button 
+        type="submit" 
+        className="submit-button" 
+        disabled={!agreedToTerms}
+      >
+        สร้างบัญชี
       </button>
     </form>
   );
